@@ -20,7 +20,7 @@ class DVrouter(Router):
         self.neighbours = {}
 
     def broadcast_to_neighbours(self):
-        self.printer()
+        # self.printer()
         for dest_addresses in self.neighbours:
             packet = Packet("ROUTING", self.addr, dest_addresses, dumps(self.distance_vector))
             self.send(self.neighbours[dest_addresses], packet)
@@ -31,7 +31,7 @@ class DVrouter(Router):
             # Hints: this is a normal data packet
             # if the forwarding table contains packet.dstAddr
             #   send packet based on forwarding table, e.g., self.send(port, packet)
-            print("type: TRACEROUTE", "port:", port, "packet:", packet , "content:", packet.getContent(), "src addr:", packet.srcAddr, "dst Addr:", packet.dstAddr, "my addr:", self.addr)
+            # print("type: TRACEROUTE", "port:", port, "packet:", packet , "content:", packet.getContent(), "src addr:", packet.srcAddr, "dst Addr:", packet.dstAddr, "my addr:", self.addr)
             packet_dest_addr = packet.dstAddr
             for dest_addresses in self.forwarding_table:
                 if dest_addresses == packet_dest_addr:
@@ -48,7 +48,7 @@ class DVrouter(Router):
             # print("packet is routing, printing content")
             # print("port:", port, "content", packet.getContent(), "src addr:", packet.srcAddr, "dstAddr:", packet.dstAddr)
             incoming_dist_vector = loads(packet.getContent())
-            print("type: ROUTING", "port:", port, "packet:", packet , "content:", packet.getContent(), "src addr:", packet.srcAddr, "dst Addr:", packet.dstAddr, "my addr:", self.addr)
+            # print("type: ROUTING", "port:", port, "packet:", packet , "content:", packet.getContent(), "src addr:", packet.srcAddr, "dst Addr:", packet.dstAddr, "my addr:", self.addr)
             # print("incoming_dist_vector:", incoming_dist_vector)
             for dests in incoming_dist_vector:
                 if dests in self.distance_vector:
@@ -63,11 +63,7 @@ class DVrouter(Router):
                     self.distance_vector[dests] = new_cost
                     self.forwarding_table[dests] = [new_cost, packet.srcAddr, port]
                     # self.broadcast_to_neighbours()
-
-
-
-
-                
+             
                         
                       
 
@@ -97,12 +93,12 @@ class DVrouter(Router):
         # update the forwarding table
         # broadcast the distance vector of this router to neighbors
         addr = ""
-        print("removing link at port:", port)
+        # print("removing link at port:", port)
         for dests in self.neighbours:
             if self.neighbours[dests] == port:
                 addr = dests
         if addr != "":
-            print("address is:", addr)
+            # print("address is:", addr)
             self.forwarding_table[addr] = [16,0,0]
             self.distance_vector[addr] = 16
             del self.neighbours[addr]
