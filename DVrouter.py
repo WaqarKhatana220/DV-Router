@@ -96,7 +96,24 @@ class DVrouter(Router):
         # update the distance vector of this router
         # update the forwarding table
         # broadcast the distance vector of this router to neighbors
-        pass
+        addr = ""
+        print("removing link at port:", port)
+        for dests in self.neighbours:
+            if self.neighbours[dests] == port:
+                addr = dests
+        if addr != "":
+            print("address is:", addr)
+            self.forwarding_table[addr] = [16,0,0]
+            self.distance_vector[addr] = 16
+            del self.neighbours[addr]
+            for dests in self.forwarding_table:
+                if self.forwarding_table[dests][1] == addr:
+                    self.forwarding_table[dests] = [16, 0, 0]
+                    self.distance_vector[dests] = 16
+            # self.printer()
+            
+            #lets send this distance vector to neighbours
+            self.broadcast_to_neighbours() 
 
 
     def handleTime(self, timeMillisecs):
@@ -115,7 +132,3 @@ class DVrouter(Router):
         print("my neighbours:", self.neighbours)
         print("my distance_vector:", self.distance_vector)
         print("my ftable:", self.forwarding_table)
-
-    
-    
-
