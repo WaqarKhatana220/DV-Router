@@ -20,7 +20,6 @@ class DVrouter(Router):
         self.neighbours = {}
 
     def broadcast_to_neighbours(self):
-        # self.printer()
         for dest_addresses in self.neighbours:
             packet = Packet("ROUTING", self.addr, dest_addresses, dumps(self.distance_vector))
             self.send(self.neighbours[dest_addresses], packet)
@@ -31,7 +30,6 @@ class DVrouter(Router):
             # Hints: this is a normal data packet
             # if the forwarding table contains packet.dstAddr
             #   send packet based on forwarding table, e.g., self.send(port, packet)
-            # print("type: TRACEROUTE", "port:", port, "packet:", packet , "content:", packet.getContent(), "src addr:", packet.srcAddr, "dst Addr:", packet.dstAddr, "my addr:", self.addr)
             packet_dest_addr = packet.dstAddr
             for dest_addresses in self.forwarding_table:
                 if dest_addresses == packet_dest_addr:
@@ -45,10 +43,7 @@ class DVrouter(Router):
             #   update the distance vector of this router
             #   update the forwarding table
             #   broadcast the distance vector of this router to neighbors
-            # print("packet is routing, printing content")
-            # print("port:", port, "content", packet.getContent(), "src addr:", packet.srcAddr, "dstAddr:", packet.dstAddr)
             incoming_dist_vector = loads(packet.getContent())
-            # print("type: ROUTING", "port:", port, "packet:", packet , "content:", packet.getContent(), "src addr:", packet.srcAddr, "dst Addr:", packet.dstAddr, "my addr:", self.addr)
             # print("incoming_dist_vector:", incoming_dist_vector)
             for dests in incoming_dist_vector:
                 if dests in self.distance_vector:
@@ -56,20 +51,11 @@ class DVrouter(Router):
                         new_cost = incoming_dist_vector[dests] + 1
                         self.distance_vector[dests] = new_cost
                         self.forwarding_table[dests] = [new_cost, packet.srcAddr, port]
-                        #self.broadcast_to_neighbours()
 
                 else:
                     new_cost = incoming_dist_vector[dests] + 1
                     self.distance_vector[dests] = new_cost
-                    self.forwarding_table[dests] = [new_cost, packet.srcAddr, port]
-                    # self.broadcast_to_neighbours()
-             
-                        
-                      
-
-
-            
-
+                    self.forwarding_table[dests] = [new_cost, packet.srcAddr, port]            
 
     def handleNewLink(self, port, endpoint, cost):
         """TODO: handle new link"""
@@ -83,22 +69,17 @@ class DVrouter(Router):
         self.neighbours[addr] = port
         #lets send this distance vector to neighbours
         self.broadcast_to_neighbours()        
-        #what if the node already exists
-        
-
-
+       
     def handleRemoveLink(self, port):
         """TODO: handle removed link"""
         # update the distance vector of this router
         # update the forwarding table
         # broadcast the distance vector of this router to neighbors
         addr = ""
-        # print("removing link at port:", port)
         for dests in self.neighbours:
             if self.neighbours[dests] == port:
                 addr = dests
         if addr != "":
-            # print("address is:", addr)
             self.forwarding_table[addr] = [16,0,0]
             self.distance_vector[addr] = 16
             del self.neighbours[addr]
@@ -106,11 +87,9 @@ class DVrouter(Router):
                 if self.forwarding_table[dests][1] == addr:
                     self.forwarding_table[dests] = [16, 0, 0]
                     self.distance_vector[dests] = 16
-            # self.printer()
             
             #lets send this distance vector to neighbours
             self.broadcast_to_neighbours() 
-
 
     def handleTime(self, timeMillisecs):
         """TODO: handle current time"""
@@ -119,12 +98,8 @@ class DVrouter(Router):
             # broadcast the distance vector of this router to neighbors
             self.broadcast_to_neighbours()
 
-
     def debugString(self):
         """TODO: generate a string for debugging in network visualizer"""
-        return "hello"
+        my_status = "neighbours:" + str(self.neighbours) + "distanceVector:" + str(self.distance_vector) + "ftable:" + str(self.forwarding_table)
+        return my_status
 
-    def printer(self):
-        print("my neighbours:", self.neighbours)
-        print("my distance_vector:", self.distance_vector)
-        print("my ftable:", self.forwarding_table)
